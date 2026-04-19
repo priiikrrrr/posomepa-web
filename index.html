@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PosomePa — Your Space, Your Time</title>
+<style>
+@font-face{font-family:'Syne';font-style:normal;font-weight:400 800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/syne@5.0.14/files/syne-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Syne';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/syne@5.0.14/files/syne-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Syne';font-style:normal;font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/syne@5.0.14/files/syne-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@5.0.15/files/dm-sans-latin-300-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@5.0.15/files/dm-sans-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:500;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@5.0.15/files/dm-sans-latin-500-normal.woff2') format('woff2')}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p900:#0d0820;--p800:#1a1040;--p700:#26185a;--p600:#3a2490;
+  --p500:#5b3bbf;--p400:#7c5ce0;--p300:#a78df0;--p200:#c8b5f7;--p100:#e8e0fc;
+  --acc:#b06cfb;--acc2:#ff6eb4;
+  --wh:#fff;--mu:rgba(255,255,255,.52);--mi:rgba(255,255,255,.82);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--p900);color:var(--wh);overflow-x:hidden}
+
+/* noise */
+body::before{content:'';position:fixed;inset:0;opacity:.5;pointer-events:none;z-index:900;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
+
+/* cursor */
+.cur-dot,.cur-ring{position:fixed;top:0;left:0;pointer-events:none;border-radius:50%;transform:translate(-50%,-50%)}
+.cur-dot{width:7px;height:7px;background:var(--acc);z-index:9999}
+.cur-ring{width:28px;height:28px;border:1.5px solid rgba(176,108,251,.4);z-index:9998;transition:all .22s cubic-bezier(.23,1,.32,1)}
+@media(hover:none){.cur-dot,.cur-ring{display:none}}
+
+/* NAV */
+nav{position:fixed;top:0;inset-inline:0;z-index:500;display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 3rem;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(13,8,32,.6);border-bottom:.5px solid rgba(176,108,251,.1);transition:background .4s}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:.08em;
+  background:linear-gradient(135deg,var(--p200),var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{color:var(--mu);text-decoration:none;font-size:.875rem;transition:color .3s}
+.nav-links a:hover{color:var(--wh)}
+.nav-cta{background:linear-gradient(135deg,var(--p500),var(--acc));color:#fff;border:none;
+  padding:.58rem 1.35rem;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;
+  cursor:pointer;text-decoration:none;transition:opacity .3s,transform .3s;display:inline-block}
+.nav-cta:hover{opacity:.8;transform:translateY(-1px)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.3rem;background:none;border:none}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--mi);border-radius:2px;transition:.3s}
+@media(max-width:768px){.nav-links,.nav-cta{display:none}nav{padding:1.1rem 1.4rem}.hamburger{display:flex}}
+
+/* mobile menu overlay */
+.mmenu{display:none;position:fixed;inset:0;background:rgba(13,8,32,.97);z-index:490;
+  flex-direction:column;align-items:center;justify-content:center;gap:2.5rem}
+.mmenu.open{display:flex}
+.mmenu a{color:var(--mi);text-decoration:none;font-size:1.5rem;font-family:'Syne',sans-serif;font-weight:600;transition:color .3s}
+.mmenu a:hover{color:var(--acc)}
+.mm-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--mu);font-size:1.8rem;cursor:pointer}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:clamp(8rem,15vw,10rem) 1.5rem clamp(3rem,6vw,4.5rem);position:relative}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;animation:flt 9s ease-in-out infinite}
+.o1{width:min(600px,80vw);height:min(600px,80vw);background:radial-gradient(circle,rgba(91,59,191,.45),transparent 70%);top:-10%;left:-10%;animation-delay:0s}
+.o2{width:min(500px,70vw);height:min(500px,70vw);background:radial-gradient(circle,rgba(201,85,138,.35),transparent 70%);bottom:-8%;right:-8%;animation-delay:-3s}
+.o3{width:min(400px,55vw);height:min(400px,55vw);background:radial-gradient(circle,rgba(124,92,224,.28),transparent 70%);top:38%;left:36%;animation-delay:-5.5s}
+@keyframes flt{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(18px,-26px) scale(1.04)}66%{transform:translate(-14px,18px) scale(.97)}}
+
+.badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(176,108,251,.1);border:.5px solid rgba(176,108,251,.32);
+  color:var(--p200);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;padding:.42rem 1rem;border-radius:100px;
+  margin-bottom:1.8rem;animation:fu .8s ease both}
+.badge em{width:6px;height:6px;background:var(--acc);border-radius:50%;display:inline-block;animation:pulse 2s ease-in-out infinite;font-style:normal}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.6)}}
+
+.hero-h{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.8rem,8.5vw,6.5rem);
+  line-height:1;letter-spacing:-.025em;animation:fu .8s .12s ease both}
+.gr{background:linear-gradient(135deg,var(--p200) 0%,var(--acc) 40%,var(--acc2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{margin-top:1.4rem;font-size:clamp(.92rem,2.2vw,1.18rem);color:var(--mu);max-width:510px;
+  line-height:1.68;font-weight:300;animation:fu .8s .26s ease both}
+.hero-btns{margin-top:2.6rem;display:flex;gap:.9rem;align-items:center;flex-wrap:wrap;justify-content:center;animation:fu .8s .4s ease both}
+.btn-p{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--p600),var(--acc),var(--acc2));
+  color:#fff;text-decoration:none;padding:.88rem 1.9rem;border-radius:100px;font-weight:500;font-size:.97rem;
+  box-shadow:0 0 38px rgba(176,108,251,.22);border:none;cursor:pointer;transition:transform .3s,box-shadow .3s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 55px rgba(176,108,251,.42)}
+.btn-g{display:inline-flex;align-items:center;gap:.5rem;background:transparent;color:var(--mi);text-decoration:none;
+  padding:.88rem 1.7rem;border-radius:100px;font-weight:400;font-size:.97rem;border:.5px solid rgba(255,255,255,.18);transition:.3s}
+.btn-g:hover{border-color:rgba(176,108,251,.5);color:var(--wh);transform:translateY(-2px)}
+
+.hero-stats{margin-top:4rem;display:flex;gap:clamp(1.2rem,4vw,3rem);align-items:center;flex-wrap:wrap;justify-content:center;animation:fu .8s .55s ease both}
+.stat-num{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,2.8vw,1.95rem);font-weight:700;
+  background:linear-gradient(135deg,var(--p200),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-lbl{font-size:.7rem;color:var(--mu);letter-spacing:.08em;margin-top:.18rem;text-align:center}
+.sdiv{width:.5px;height:42px;background:rgba(255,255,255,.1);flex-shrink:0}
+@media(max-width:440px){.sdiv{display:none}}
+
+.scroll-ind{display:flex;flex-direction:column;align-items:center;gap:.38rem;color:var(--mu);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;margin-top:2.5rem;animation:fu 1s .8s ease both}
+.scroll-line{width:.5px;height:30px;background:linear-gradient(to bottom,rgba(176,108,251,.7),transparent);animation:sl 2s ease-in-out infinite}
+@keyframes sl{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(.45);opacity:.2}}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* shared */
+section{padding:clamp(4rem,8vw,7rem) clamp(1.2rem,5vw,2rem);position:relative}
+.cnt{max-width:1100px;margin:0 auto}
+.eye{display:inline-block;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:.85rem}
+.sec-h{font-family:'Syne',sans-serif;font-size:clamp(1.75rem,4.5vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.sec-s{color:var(--mu);font-size:clamp(1rem,1.15vw,1.1rem);line-height:1.7;font-weight:300;max-width:490px}
+.div{width:100%;height:.5px;background:linear-gradient(to right,transparent,rgba(176,108,251,.18),transparent)}
+.rev{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rev.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+/* MARQUEE */
+.mq-wrap{overflow:hidden;position:relative;padding:2.5rem 0}
+.mq-wrap::before,.mq-wrap::after{content:'';position:absolute;top:0;bottom:0;width:clamp(60px,10vw,120px);z-index:10;pointer-events:none}
+.mq-wrap::before{left:0;background:linear-gradient(to right,var(--p900),transparent)}
+.mq-wrap::after{right:0;background:linear-gradient(to left,var(--p900),transparent)}
+.mq-track{display:flex;gap:1rem;animation:sl2 28s linear infinite;width:max-content}
+.mq-track:hover{animation-play-state:paused}
+@keyframes sl2{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.cpill{display:flex;align-items:center;gap:.55rem;background:rgba(255,255,255,.04);border:.5px solid rgba(176,108,251,.15);border-radius:100px;padding:.55rem 1.15rem;white-space:nowrap;font-size:.84rem;color:var(--mi);transition:.3s}
+.cpill:hover{border-color:rgba(176,108,251,.42);background:rgba(176,108,251,.08)}
+.ci{width:16px;height:16px;opacity:.72;flex-shrink:0}
+
+/* HOW */
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.4rem;margin-top:3.5rem}
+.step-card{background:rgba(255,255,255,.03);border:.5px solid rgba(176,108,251,.13);border-radius:20px;padding:2.2rem 1.8rem;position:relative;overflow:hidden;transition:.4s}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(176,108,251,.06),transparent);opacity:0;transition:opacity .4s}
+.step-card:hover{border-color:rgba(176,108,251,.36);transform:translateY(-4px);background:rgba(255,255,255,.05)}
+.step-card:hover::before{opacity:1}
+.sn{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:rgba(176,108,251,.1);line-height:1;margin-bottom:.9rem;letter-spacing:-.04em}
+.siw{width:42px;height:42px;background:rgba(176,108,251,.1);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.siw svg{width:21px;height:21px}
+.st{font-family:'Syne',sans-serif;font-weight:600;font-size:1.06rem;margin-bottom:.6rem}
+.sd{color:var(--mu);font-size:clamp(.86rem,1vw,.97rem);line-height:1.65;font-weight:300}
+
+/* BENTO */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem;margin-top:3.5rem}
+.bc{background:rgba(255,255,255,.03);border:.5px solid rgba(176,108,251,.13);border-radius:22px;padding:1.75rem;overflow:hidden;position:relative;transition:.4s}
+.bc:hover{border-color:rgba(176,108,251,.3);transform:translateY(-3px);background:rgba(255,255,255,.05)}
+.bl{grid-column:span 7}.bs{grid-column:span 5}.bt{grid-column:span 4}.bw{grid-column:span 8}
+@media(max-width:880px){.bl,.bs,.bt,.bw{grid-column:span 12}}
+.bt2{display:inline-flex;align-items:center;gap:.38rem;background:rgba(176,108,251,.1);border:.5px solid rgba(176,108,251,.2);color:var(--p300);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.26rem .7rem;border-radius:100px;margin-bottom:1rem}
+.bh{font-family:'Syne',sans-serif;font-size:1.18rem;font-weight:600;margin-bottom:.55rem}
+.bd{color:var(--mu);font-size:clamp(.84rem,1vw,.96rem);line-height:1.65;font-weight:300}
+.aibox{margin-top:1.3rem;background:rgba(0,0,0,.2);border-radius:13px;border:.5px solid rgba(176,108,251,.17);padding:.85rem 1rem;font-size:.78rem;color:var(--mu)}
+.aiq{color:var(--p200);font-size:.84rem;margin-bottom:.65rem;padding-bottom:.65rem;border-bottom:.5px solid rgba(255,255,255,.06)}
+.air{display:flex;align-items:center;gap:.6rem;padding:.42rem 0;border-bottom:.5px solid rgba(255,255,255,.04)}
+.air:last-child{border-bottom:none}
+.aid{width:5px;height:5px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.ais{font-size:.7rem;color:var(--acc);font-weight:500}
+.mapbox{margin-top:1.3rem;height:105px;background:rgba(0,0,0,.25);border-radius:13px;border:.5px solid rgba(176,108,251,.13);position:relative;overflow:hidden}
+.mgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(176,108,251,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(176,108,251,.05) 1px,transparent 1px);background-size:22px 22px}
+.mpin{position:absolute;width:11px;height:11px;border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
+.mpin::after{content:'';position:absolute;inset:3px;background:#fff;border-radius:50%}
+.mrip{position:absolute;width:34px;height:34px;border:1px solid rgba(176,108,251,.3);border-radius:50%;animation:rip 2.2s ease-out infinite}
+@keyframes rip{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+.paybox{margin-top:1.3rem;background:rgba(0,0,0,.2);border-radius:13px;border:.5px solid rgba(176,108,251,.13);padding:.85rem 1rem}
+.pr{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;padding:.4rem 0;border-bottom:.5px solid rgba(255,255,255,.05);color:var(--mu)}
+.pr:last-child{border-bottom:none}
+.pv{color:var(--wh);font-weight:500}.pg{color:#4ade80}
+.kycl{margin-top:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.kyi{display:flex;align-items:center;gap:.65rem;font-size:.78rem;color:var(--mu)}
+.kyc{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.6rem}
+.kd{background:rgba(74,222,128,.12);color:#4ade80;border:.5px solid rgba(74,222,128,.25)}
+.kp{background:rgba(176,108,251,.1);color:var(--acc);border:.5px solid rgba(176,108,251,.2)}
+.nrow{display:flex;gap:.65rem;margin-top:1.1rem;flex-wrap:wrap}
+.np{flex:1;min-width:125px;border-radius:11px;padding:.65rem .85rem;font-size:.7rem}
+
+/* WHO */
+.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:3.5rem}
+@media(max-width:620px){.who-grid{grid-template-columns:1fr}}
+.wcard{border-radius:24px;padding:clamp(1.8rem,4vw,2.5rem) clamp(1.4rem,3.5vw,2rem)}
+.wr{background:linear-gradient(135deg,rgba(91,59,191,.2),rgba(58,36,144,.1));border:.5px solid rgba(124,92,224,.26)}
+.wh{background:linear-gradient(135deg,rgba(201,85,138,.17),rgba(176,108,251,.1));border:.5px solid rgba(201,85,138,.26)}
+.wi{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.35rem}
+.wr .wi{background:rgba(124,92,224,.17)}.wh .wi{background:rgba(201,85,138,.17)}
+.wt{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,1.6vw,1.5rem);font-weight:700;margin-bottom:.42rem}
+.ws{color:var(--mu);font-size:clamp(.86rem,1.05vw,1rem);margin-bottom:1.3rem;font-weight:300}
+.wl{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.wl li{display:flex;align-items:flex-start;gap:.55rem;font-size:clamp(.84rem,1.05vw,.98rem);color:var(--mi);line-height:1.5}
+.wl li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:.42em}
+
+/* TECH */
+.tech-row{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:2.8rem}
+.tbadge{display:flex;align-items:center;gap:.65rem;background:rgba(255,255,255,.03);border:.5px solid rgba(176,108,251,.12);border-radius:13px;padding:.85rem 1.2rem;transition:.3s;flex:1;min-width:155px}
+.tbadge:hover{border-color:rgba(176,108,251,.36);transform:translateY(-2px)}
+.td{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tn{font-size:clamp(.84rem,1.1vw,.97rem);font-weight:500}.tr{font-size:clamp(.7rem,.9vw,.82rem);color:var(--mu);margin-top:.1rem}
+
+/* DOWNLOAD */
+.dl-sec{padding:clamp(4rem,8vw,7rem) 1.5rem;text-align:center;position:relative;overflow:hidden}
+.dl-glow{position:absolute;width:580px;height:380px;background:radial-gradient(circle,rgba(176,108,251,.2),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.dl-card{max-width:590px;margin:0 auto;background:rgba(255,255,255,.03);border:.5px solid rgba(176,108,251,.17);border-radius:28px;padding:clamp(2.5rem,5vw,3.5rem) clamp(1.5rem,5vw,3rem);position:relative}
+.dl-h{font-family:'Syne',sans-serif;font-size:clamp(1.75rem,5vw,2.8rem);font-weight:700;line-height:1.1;margin-bottom:.85rem}
+.dl-s{color:var(--mu);font-size:.96rem;margin-bottom:2.2rem;line-height:1.65;font-weight:300}
+.dl-btns{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+.dlb{display:inline-flex;align-items:center;gap:.65rem;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.15);border-radius:13px;padding:.78rem 1.3rem;text-decoration:none;color:var(--wh);transition:.3s}
+.dlb:hover{background:rgba(176,108,251,.13);border-color:rgba(176,108,251,.36);transform:translateY(-2px)}
+.dlb svg{width:26px;height:26px;flex-shrink:0}
+.ds{font-size:.62rem;color:var(--mu);display:block}
+.dn{font-size:.9rem;font-weight:500;display:block}
+
+/* FOOTER */
+footer{border-top:.5px solid rgba(176,108,251,.1);padding:2.2rem clamp(1.4rem,5vw,3rem);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.fl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;background:linear-gradient(135deg,var(--p200),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ft{color:var(--mu);font-size:.72rem}
+
+/* ===== PHONE MOCKUPS ===== */
+.phones-sec{padding:clamp(3rem,6vw,5.5rem) clamp(1.2rem,5vw,2rem);overflow:hidden}
+.phones-hdr{text-align:center;margin-bottom:clamp(2.5rem,5vw,4rem)}
+.mock-wrap{display:flex;align-items:flex-end;justify-content:center;gap:clamp(.6rem,1.5vw,1.4rem)}
+
+/* phone shell */
+.ph{border-radius:38px;overflow:hidden;background:#100928;flex-shrink:0;position:relative;border:1.5px solid rgba(176,108,251,.3);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 50px rgba(176,108,251,.09)}
+.ph-c{width:clamp(200px,30vw,245px);z-index:2;border-color:rgba(176,108,251,.52);box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 80px rgba(176,108,251,.18);max-height:clamp(430px,58vw,530px);overflow:hidden}
+.ph-s{width:clamp(165px,23vw,208px);opacity:.62}
+.ph-sl{transform:rotate(-5deg) translateX(12px) scale(.93);max-height:clamp(420px,55vw,520px);overflow:hidden}
+.ph-sr{transform:rotate(5deg) translateX(-12px) scale(.93);max-height:clamp(420px,55vw,520px);overflow:hidden}
+@media(max-width:580px){.ph-sl,.ph-sr{display:none}.ph-c{width:min(270px,82vw)}}
+
+/* status bar */
+.pst{display:flex;justify-content:space-between;padding:.52rem .9rem .28rem;font-size:.5rem;color:rgba(255,255,255,.45)}
+.pst-icons{display:flex;align-items:center;gap:3px}
+
+/* --- WELCOME PHONE --- */
+.pw-top{background:linear-gradient(185deg,#1c0e4a 0%,#0d0820 55%);padding:.1rem .9rem 0}
+.pw-orb-wrap{position:relative;width:90px;height:90px;margin:1.2rem auto .8rem}
+.pw-orb1{position:absolute;inset:0;border-radius:50%;background:rgba(91,59,191,.55);filter:blur(12px)}
+.pw-orb2{position:absolute;width:55px;height:55px;background:rgba(176,108,251,.35);border-radius:50%;top:12px;left:4px;filter:blur(9px)}
+.pw-orb3{position:absolute;width:42px;height:42px;background:rgba(201,85,138,.28);border-radius:50%;bottom:4px;right:2px;filter:blur(7px)}
+.pw-tagbadge{display:inline-block;border:.5px solid rgba(255,255,255,.18);border-radius:100px;font-size:.48rem;color:rgba(255,255,255,.42);padding:.2rem .65rem;letter-spacing:.1em;margin-bottom:.55rem}
+.pw-bname{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:.06em;
+  background:linear-gradient(135deg,var(--p300),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:.18rem}
+.pw-bsub{font-size:.46rem;letter-spacing:.14em;color:rgba(255,255,255,.26);text-align:center;margin-bottom:1.1rem}
+.pw-bottom{background:#eeeaff;padding:1rem .9rem 1.2rem}
+.pw-ftitle{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#1a1040;line-height:1.2;margin-bottom:.3rem;text-align:center}
+.pw-fsub{font-size:.5rem;color:#777;text-align:center;margin-bottom:.75rem}
+.pw-steps{display:flex;justify-content:center;align-items:center;gap:.3rem;margin-bottom:.8rem}
+.pw-sbtn{display:flex;align-items:center;gap:.25rem;background:rgba(0,0,0,.07);border-radius:100px;padding:.22rem .55rem;font-size:.5rem;color:#555}
+.pw-sbtn svg{width:9px;height:9px;opacity:.65}
+.pw-sep{font-size:.55rem;color:#bbb}
+.pw-cta{background:linear-gradient(135deg,#5b3bbf,#c9558a);border-radius:100px;padding:.52rem 0;font-size:.64rem;font-weight:600;color:#fff;display:block;text-align:center;width:100%;margin-bottom:.5rem;border:none;cursor:default}
+.pw-tag3{display:flex;justify-content:center;gap:.5rem;font-size:.44rem;color:#aaa;letter-spacing:.1em}
+
+/* --- HOME PHONE (center) --- */
+.ph-topbar{padding:.45rem .9rem .8rem;background:linear-gradient(185deg,rgba(91,59,191,.4) 0%,transparent 100%)}
+.ph-greet{font-size:.5rem;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.28rem;margin-bottom:.2rem}
+.ph-uname{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.35rem}
+.ph-mem{display:inline-flex;align-items:center;gap:.28rem;background:rgba(176,108,251,.18);border:.5px solid rgba(176,108,251,.28);border-radius:100px;padding:.16rem .52rem;font-size:.5rem;color:var(--p300)}
+.ph-mem em{width:4px;height:4px;background:var(--acc);border-radius:50%;font-style:normal;display:inline-block}
+.ph-logout{width:26px;height:26px;background:rgba(255,255,255,.07);border-radius:7px;display:flex;align-items:center;justify-content:center}
+
+.ph-body{padding:.65rem .9rem}
+.ph-disc{font-size:.52rem;color:rgba(255,255,255,.38);display:flex;align-items:center;gap:.3rem;margin-bottom:.55rem}
+.ph-vcard{background:rgba(176,108,251,.12);border:.5px solid rgba(176,108,251,.2);border-radius:13px;padding:.72rem .82rem;margin-bottom:.65rem}
+.ph-vchead{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem}
+.ph-vcbrand{font-size:.5rem;color:var(--p300);letter-spacing:.08em;font-weight:600}
+.ph-vcslider{display:flex;gap:2px;align-items:center}
+.ph-vcslider span:first-child{width:10px;height:2px;background:rgba(255,255,255,.3);border-radius:1px}
+.ph-vcslider span{width:4px;height:2px;background:rgba(255,255,255,.14);border-radius:1px}
+.ph-vcrow{display:flex;align-items:center;gap:.58rem}
+.ph-shield{width:27px;height:27px;background:rgba(176,108,251,.22);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ph-vct{font-weight:600;font-size:.7rem}
+.ph-vcs{font-size:.54rem;color:rgba(255,255,255,.45);margin-top:.08rem}
+.ph-vcarrow{margin-left:auto;width:19px;height:19px;background:rgba(255,255,255,.07);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.ph-vtags{display:flex;gap:.35rem;margin-top:.5rem}
+.ph-vt{font-size:.48rem;color:rgba(255,255,255,.48);display:flex;align-items:center;gap:.18rem}
+.ph-vt::before{content:'';width:4px;height:4px;background:var(--acc);border-radius:50%;display:inline-block}
+
+.ph-exh{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;margin-bottom:.15rem}
+.ph-exs{font-size:.52rem;color:rgba(255,255,255,.38);margin-bottom:.45rem}
+.ph-pills{display:flex;gap:.32rem;margin-bottom:.65rem;overflow:hidden}
+.ph-pill{font-size:.5rem;padding:.2rem .52rem;border-radius:100px;white-space:nowrap;border:.5px solid rgba(176,108,251,.18);color:rgba(255,255,255,.52);display:flex;align-items:center;gap:.2rem}
+.ph-pill.act{background:rgba(176,108,251,.24);color:var(--acc);border-color:rgba(176,108,251,.38)}
+
+.ph-sph{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;margin-bottom:.45rem}
+.ph-scard{background:rgba(176,108,251,.08);border:.5px solid rgba(176,108,251,.14);border-radius:11px;overflow:hidden;margin-bottom:.45rem}
+.ph-simg{height:46px;display:flex;align-items:center;justify-content:center}
+.ph-sinfo{padding:.42rem .65rem;display:flex;justify-content:space-between;align-items:flex-start}
+.ph-sname{font-size:.62rem;font-weight:600;margin-bottom:.08rem}
+.ph-sloc{font-size:.5rem;color:rgba(255,255,255,.42)}
+.ph-sprice{font-size:.54rem;color:var(--acc);font-weight:500}
+
+.ph-nav{display:flex;justify-content:space-around;align-items:center;border-top:.5px solid rgba(176,108,251,.16);padding:.58rem 0 .45rem;background:rgba(10,6,22,.5);margin-top:.3rem}
+.ph-ni{display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.46rem;color:rgba(255,255,255,.38)}
+.ph-ni.act{color:var(--acc)}
+.ph-ni svg{width:13px;height:13px}
+
+/* --- PROFILE PHONE --- */
+.pp-top{display:flex;flex-direction:column;align-items:center;padding:.7rem .9rem .65rem;background:linear-gradient(185deg,rgba(91,59,191,.32) 0%,transparent 100%)}
+.pp-av{width:42px;height:42px;background:var(--p500);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.38rem;border:1.5px solid rgba(176,108,251,.35)}
+.pp-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;margin-bottom:.1rem}
+.pp-email{font-size:.48rem;color:rgba(255,255,255,.42);margin-bottom:.35rem}
+.pp-mc{background:rgba(255,255,255,.04);border:.5px solid rgba(176,108,251,.14);border-radius:12px;margin:.5rem .85rem}
+.pp-mi{display:flex;align-items:center;gap:.52rem;padding:.55rem .7rem;border-bottom:.5px solid rgba(176,108,251,.09);font-size:.58rem}
+.pp-mi:last-child{border-bottom:none}
+.pp-micon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pp-micon svg{width:10px;height:10px}
+.pp-mlbl{flex:1;font-weight:500;font-size:.6rem}
+.pp-msub{font-size:.48rem;color:rgba(255,255,255,.38);margin-top:.04rem}
+.pp-chev{color:rgba(255,255,255,.24);font-size:.6rem}
+.pp-theme{display:flex;align-items:center;margin:.5rem .85rem;background:rgba(255,255,255,.04);border-radius:11px;padding:.48rem .7rem;gap:.4rem}
+.pp-tlbl{font-size:.5rem;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;flex:0 0 auto}
+.pp-tbtn{flex:1;display:flex;justify-content:center;padding:.22rem;border-radius:7px}
+.pp-tact{background:rgba(176,108,251,.28)}
+.pp-tbtn svg{width:9px;height:9px}
+
+/* 3D TILT */
+.tilt3d{transform-style:preserve-3d;transition:transform .15s ease,box-shadow .15s ease;will-change:transform}
+.tilt3d:hover{box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 60px rgba(176,108,251,.18)!important}
+.mock-wrap{perspective:1200px}
+.ph-c{transform-style:preserve-3d}
+</style>
+</head>
+<body>
+
+<div class="cur-dot" id="cdot"></div>
+<div class="cur-ring" id="cring"></div>
+
+<!-- mobile menu -->
+<div class="mmenu" id="mmenu">
+  <button class="mm-close" id="mmclose">✕</button>
+  <a href="#how" onclick="closeMM()">How it Works</a>
+  <a href="#features" onclick="closeMM()">Features</a>
+  <a href="#who" onclick="closeMM()">For You</a>
+  <a href="#download" onclick="closeMM()">Download</a>
+</div>
+
+<nav id="nav">
+  <div class="nav-logo">POSOMEPA</div>
+  <ul class="nav-links">
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#who">For You</a></li>
+    <li><a href="#download">Download</a></li>
+  </ul>
+  <a href="#download" class="nav-cta">Get the app</a>
+  <button class="hamburger" id="hbg" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="badge"><em></em> India's First Hourly Space Marketplace</div>
+  <h1 class="hero-h">Your Space,<br/><span class="gr">Your Time.</span></h1>
+  <p class="hero-sub">Discover and book workspaces, creative studios &amp; event venues by the hour — no deposits, no lock-ins, zero friction.</p>
+  <div class="hero-btns">
+    <a href="#download" class="btn-p">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Now
+    </a>
+    <a href="#how" class="btn-g">
+      How it works
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">₹0</div><div class="stat-lbl">Deposit Required</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-num">&lt;30s</div><div class="stat-lbl">Booking Time</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-num">AI</div><div class="stat-lbl">Powered Search</div></div>
+    <div class="sdiv"></div>
+    <div class="stat"><div class="stat-num">KYC</div><div class="stat-lbl">Verified Hosts</div></div>
+  </div>
+  <div class="scroll-ind"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq-wrap">
+  <div class="mq-track" id="mq">
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 0-4 0v2"/></svg>Coworking Spaces</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/></svg>Creative Studios</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Event Venues</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Apartments</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>Villas</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>Rooftops</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Film Sets</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music Rooms</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Photo Studios</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Meeting Rooms</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wellness Spaces</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Pop-up Kitchens</div>
+    <!-- dupe for loop -->
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 0-4 0v2"/></svg>Coworking Spaces</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/></svg>Creative Studios</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Event Venues</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Apartments</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><path d="M2 9h20"/></svg>Villas</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>Rooftops</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Film Sets</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music Rooms</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Photo Studios</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Meeting Rooms</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wellness Spaces</div>
+    <div class="cpill"><svg class="ci" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Pop-up Kitchens</div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="cnt">
+    <div class="rev">
+      <span class="eye">How it works</span>
+      <h2 class="sec-h">Book in <span class="gr">three simple steps</span></h2>
+      <p class="sec-s">From open to confirmed — the entire flow takes under a minute.</p>
+    </div>
+    <div class="how-grid">
+      <div class="step-card rev d1">
+        <div class="sn">01</div>
+        <div class="siw"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="st">Start booking</div>
+        <div class="sd">Browse spaces, check availability, and begin your booking in seconds.</div>
+      </div>
+      <div class="step-card rev d2">
+        <div class="sn">02</div>
+        <div class="siw"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="st">Pick your slot</div>
+        <div class="sd">Filter by category, price, and amenities. Choose a date, time, and duration from live availability. No hidden fees — ever.</div>
+      </div>
+      <div class="step-card rev d3">
+        <div class="sn">03</div>
+        <div class="siw"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></div>
+        <div class="st">Confirm &amp; go</div>
+        <div class="sd">Pay securely with Razorpay in under 30 seconds. Instant confirmation, GPS directions, and a direct chat line to your host.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- PHONES -->
+<section class="phones-sec">
+  <div class="cnt">
+    <div class="phones-hdr rev">
+      <span class="eye">The app</span>
+      <h2 class="sec-h">Built for India.<br/><span class="gr">Designed for now.</span></h2>
+    </div>
+
+    <div class="mock-wrap rev">
+
+      <!-- LEFT: Splash / Welcome -->
+      <div class="ph ph-s ph-sl">
+        <div class="pst"><span>9:41</span><div class="pst-icons"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5"/><path d="M5 12c2-2 12-2 14 0"/><path d="M8.5 15.5c1-1 6-1 7 0"/><circle cx="12" cy="19" r="1"/></svg>&nbsp;84%</div></div>
+        <div class="pw-top">
+          <div style="text-align:center">
+            <div class="pw-orb-wrap"><div class="pw-orb1"></div><div class="pw-orb2"></div><div class="pw-orb3"></div></div>
+            <div class="pw-tagbadge">Your Space, Your Time</div>
+            <div class="pw-bname">POSOMEPA</div>
+            <div class="pw-bsub">p o s t &nbsp; s o m e &nbsp; p l a c e s</div>
+          </div>
+        </div>
+        <div class="pw-bottom">
+          <div class="pw-ftitle">Find your<br/>perfect space</div>
+          <div class="pw-fsub">Discover and book unique spaces around you — in seconds.</div>
+          <div class="pw-steps">
+            <div class="pw-sbtn"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search</div>
+            <span class="pw-sep">›</span>
+            <div class="pw-sbtn"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Slot</div>
+            <span class="pw-sep">›</span>
+            <div class="pw-sbtn"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Confirm</div>
+          </div>
+          <div class="pw-cta">Get Started &nbsp;→</div>
+          <div class="pw-tag3"><span>DISCOVER</span><span>·</span><span>BOOK</span><span>·</span><span>ENJOY</span></div>
+        </div>
+      </div>
+
+      <!-- CENTER: Home screen -->
+      <div class="ph ph-c">
+        <div class="pst"><span>9:41</span><div class="pst-icons"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5"/><path d="M5 12c2-2 12-2 14 0"/><path d="M8.5 15.5c1-1 6-1 7 0"/><circle cx="12" cy="19" r="1"/></svg>&nbsp;84%</div></div>
+
+        <div class="ph-topbar">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <div>
+              <div class="ph-greet">
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="rgba(255,255,255,.45)"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                GOOD AFTERNOON
+              </div>
+              <div class="ph-uname">Guest</div>
+              <div class="ph-mem"><em></em> PosomePa</div>
+            </div>
+            <div class="ph-logout">
+              <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="ph-body">
+          <div class="ph-disc">
+            <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Discovering spaces near you...
+          </div>
+
+          <div class="ph-vcard">
+            <div class="ph-vchead">
+              <span class="ph-vcbrand">POSOMEPA</span>
+              <div class="ph-vcslider"><span></span><span></span><span></span><span></span></div>
+            </div>
+            <div class="ph-vcrow">
+              <div class="ph-shield"><svg width="12" height="12" fill="none" stroke="var(--p300)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div><div class="ph-vct">Verified Hosts</div><div class="ph-vcs">Identity checked ✅</div></div>
+              <div class="ph-vcarrow"><svg width="7" height="7" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+            </div>
+            <div class="ph-vtags">
+              <div class="ph-vt">Verified</div>
+              <div class="ph-vt">Instant Book</div>
+              <div class="ph-vt">Free Cancel</div>
+            </div>
+          </div>
+
+          <div class="ph-exh">Explore</div>
+          <div class="ph-exs">What are you looking for?</div>
+          <div class="ph-pills">
+            <div class="ph-pill act">
+              <svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>All
+            </div>
+            <div class="ph-pill">
+              <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Apartments
+            </div>
+            <div class="ph-pill">Villas</div>
+            <div class="ph-pill">Roof</div>
+          </div>
+
+          <div class="ph-sph">All Spaces</div>
+          <div class="ph-scard">
+            <div class="ph-simg" style="background:linear-gradient(135deg,rgba(91,59,191,.6),rgba(176,108,251,.3))">
+              <svg width="20" height="20" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="ph-sinfo">
+              <div><div class="ph-sname">Hauz Khas Studio</div><div class="ph-sloc">South Delhi · 2.3 km away</div></div>
+              <div class="ph-sprice">₹400/hr</div>
+            </div>
+          </div>
+          <div class="ph-scard">
+            <div class="ph-simg" style="background:linear-gradient(135deg,rgba(201,85,138,.5),rgba(176,108,251,.25))">
+              <svg width="20" height="20" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="ph-sinfo">
+              <div><div class="ph-sname">Mehrauli Loft</div><div class="ph-sloc">South Delhi · 4.1 km away</div></div>
+              <div class="ph-sprice">₹650/hr</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="ph-nav">
+          <div class="ph-ni act"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</div>
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Search</div>
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Bookings</div>
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Profile screen -->
+      <div class="ph ph-s ph-sr">
+        <div class="pst"><span>9:41</span><span>84%</span></div>
+        <div class="pp-top">
+          <div class="pp-av">G</div>
+          <div class="pp-name">Guest User</div>
+          <div class="pp-email">guest@posomepa.com</div>
+          <div class="ph-mem"><em></em> Member</div>
+        </div>
+
+        <div class="pp-mc">
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(255,193,7,.14)"><svg fill="none" stroke="#fbbf24" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div><div class="pp-mlbl">Become a Host</div><div class="pp-msub">List your property &amp; earn</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(251,146,60,.14)"><svg fill="none" stroke="#fb923c" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div><div class="pp-mlbl">Notifications</div><div class="pp-msub">Messages from hosts</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(176,108,251,.14)"><svg fill="none" stroke="var(--acc)" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div><div class="pp-mlbl">Edit Profile</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(239,68,68,.14)"><svg fill="none" stroke="#f87171" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+            <div><div class="pp-mlbl">Liked Properties</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+        </div>
+
+        <div class="pp-theme">
+          <span class="pp-tlbl">THEME</span>
+          <div class="pp-tbtn"><svg fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg></div>
+          <div class="pp-tbtn"><svg fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div>
+          <div class="pp-tbtn pp-tact"><svg fill="none" stroke="var(--acc)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+        </div>
+
+        <div class="pp-mc">
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(52,211,153,.14)"><svg fill="none" stroke="#34d399" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+            <div><div class="pp-mlbl">Support</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(176,108,251,.12)"><svg fill="none" stroke="var(--p300)" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><div class="pp-mlbl">Terms &amp; Conditions</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+          <div class="pp-mi">
+            <div class="pp-micon" style="background:rgba(176,108,251,.12)"><svg fill="none" stroke="var(--p300)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="pp-mlbl">Privacy Policy</div></div>
+            <div class="pp-chev">›</div>
+          </div>
+        </div>
+
+        <div class="ph-nav">
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</div>
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Search</div>
+          <div class="ph-ni"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Bookings</div>
+          <div class="ph-ni act"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- FEATURES BENTO -->
+<section id="features">
+  <div class="cnt">
+    <div class="rev">
+      <span class="eye">Features</span>
+      <h2 class="sec-h">Everything you need,<br/><span class="gr">nothing you don't.</span></h2>
+    </div>
+    <div class="bento">
+      <div class="bc bl rev d1">
+        <div class="bt2">✦ Groq AI</div>
+        <div class="bh">Natural language search</div>
+        <div class="bd">Type what you need in plain words. Our AI instantly surfaces the most relevant spaces — no filters, no friction.</div>
+        <div class="aibox">
+          <div class="aiq"><svg width="11" height="11" fill="none" stroke="var(--p300)" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>"quiet creative studio, 4 hours, South Delhi"</div>
+          <div class="air"><div class="aid"></div><div style="flex:1">Hauz Khas Studio — Photography space</div><div class="ais">98%</div></div>
+          <div class="air"><div class="aid" style="background:var(--p300)"></div><div style="flex:1">Mehrauli Loft — Creative studio</div><div class="ais">91%</div></div>
+          <div class="air"><div class="aid" style="background:rgba(176,108,251,.35)"></div><div style="flex:1">Saket Workshop — Open plan</div><div class="ais">84%</div></div>
+        </div>
+      </div>
+      <div class="bc bs rev d2">
+        <div class="bt2">📍 OpenStreetMap</div>
+        <div class="bh">Real-time GPS</div>
+        <div class="bd">Navigate to your booking with live directions. No need to leave the app.</div>
+        <div class="mapbox">
+          <div class="mgrid"></div>
+          <div class="mrip" style="top:43%;left:45%"></div>
+          <div class="mpin" style="top:36%;left:41%;background:var(--acc)"></div>
+          <div class="mpin" style="top:54%;left:59%;background:var(--acc2)"></div>
+          <div style="position:absolute;bottom:6px;right:8px;font-size:.54rem;color:var(--mu);background:rgba(0,0,0,.45);padding:.15rem .42rem;border-radius:5px">2 spaces nearby</div>
+        </div>
+      </div>
+      <div class="bc bt rev">
+        <div class="bt2">💳 Razorpay</div>
+        <div class="bh">Pay in &lt;30 seconds</div>
+        <div class="bd">Zero deposit. Instant confirmation.</div>
+        <div class="paybox">
+          <div class="pr"><span>Studio — 3 hrs</span><span class="pv">₹1,200</span></div>
+          <div class="pr"><span>Platform fee</span><span class="pv">₹0</span></div>
+          <div class="pr"><span>Total</span><span class="pv">₹1,200</span></div>
+          <div class="pr"><span>Status</span><span class="pg">✓ Confirmed</span></div>
+        </div>
+      </div>
+      <div class="bc bt rev d1">
+        <div class="bt2">🛡 Verified</div>
+        <div class="bh">KYC hosts only</div>
+        <div class="bd">Every host is identity-verified before listing.</div>
+        <div class="kycl">
+          <div class="kyi"><div class="kyc kd">✓</div><span>Aadhaar / PAN verified</span></div>
+          <div class="kyi"><div class="kyc kd">✓</div><span>Document uploaded</span></div>
+          <div class="kyi"><div class="kyc kd">✓</div><span>Admin approved</span></div>
+          <div class="kyi"><div class="kyc kp">●</div><span>Listed &amp; active</span></div>
+        </div>
+      </div>
+      <div class="bc bt rev d2">
+        <div class="bt2">💬 AI Moderated</div>
+        <div class="bh">In-app host chat</div>
+        <div class="bd">Message hosts directly. AI keeps it safe automatically.</div>
+        <div class="aibox" style="margin-top:1rem">
+          <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.52rem"><div style="width:17px;height:17px;background:var(--p600);border-radius:50%;flex-shrink:0;font-size:.5rem;display:flex;align-items:center;justify-content:center">H</div><div style="background:rgba(255,255,255,.06);border-radius:0 8px 8px 8px;padding:.32rem .52rem;font-size:.68rem;color:var(--mi)">Parking is free for guests!</div></div>
+          <div style="display:flex;align-items:flex-start;gap:.5rem;flex-direction:row-reverse"><div style="width:17px;height:17px;background:var(--acc);border-radius:50%;flex-shrink:0;font-size:.5rem;display:flex;align-items:center;justify-content:center">G</div><div style="background:rgba(176,108,251,.18);border-radius:8px 0 8px 8px;padding:.32rem .52rem;font-size:.68rem;color:var(--mi)">Is AC available all day?</div></div>
+        </div>
+      </div>
+      <div class="bc bw rev">
+        <div class="bt2">🔔 Firebase FCM</div>
+        <div class="bh">Real-time push notifications</div>
+        <div class="bd">Instant alerts for confirmations, host messages, check-in reminders, and review requests.</div>
+        <div class="nrow">
+          <div class="np" style="background:rgba(74,222,128,.07);border:.5px solid rgba(74,222,128,.18)"><div style="color:#4ade80;margin-bottom:.22rem;font-size:.68rem">✓ Booking Confirmed</div><div style="color:var(--mu)">Hauz Khas Studio · Today 3 PM</div></div>
+          <div class="np" style="background:rgba(176,108,251,.07);border:.5px solid rgba(176,108,251,.18)"><div style="color:var(--acc);margin-bottom:.22rem;font-size:.68rem">💬 New message</div><div style="color:var(--mu)">Host: "See you at 3!"</div></div>
+          <div class="np" style="background:rgba(251,191,36,.07);border:.5px solid rgba(251,191,36,.18)"><div style="color:#fbbf24;margin-bottom:.22rem;font-size:.68rem">⭐ Leave a Review</div><div style="color:var(--mu)">How was your session?</div></div>
+        </div>
+      </div>
+      <div class="bc bt rev d1">
+        <div class="bt2">⭐ Reviews</div>
+        <div class="bh">Post-booking ratings</div>
+        <div class="bd">Transparent reviews after every booking build a trusted community.</div>
+        <div style="display:flex;gap:.2rem;margin-top:1rem;margin-bottom:.42rem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div style="font-size:.76rem;color:var(--mu);font-style:italic">"Perfect space, exactly as described. Host was super responsive!"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- FOR WHO -->
+<section id="who">
+  <div class="cnt">
+    <div class="rev" style="text-align:center;max-width:540px;margin:0 auto">
+      <span class="eye">Built for both sides</span>
+      <h2 class="sec-h">Renters &amp; Hosts,<br/><span class="gr">both win.</span></h2>
+    </div>
+    <div class="who-grid">
+      <div class="wcard wr rev d1 tilt3d">
+        <div class="wi"><svg width="24" height="24" fill="none" stroke="var(--p300)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="wt">For Renters</div>
+        <div class="ws">Book any space, any time — no hassle.</div>
+        <ul class="wl">
+          <li>Zero deposits &amp; zero lock-ins</li>
+          <li>AI-matched recommendations</li>
+          <li>Real-time availability &amp; GPS directions</li>
+          <li>Instant Razorpay booking — under 30 seconds</li>
+          <li>In-app chat with your host</li>
+          <li>Leave reviews after your session</li>
+          <li>Dark mode · iOS &amp; Android</li>
+        </ul>
+      </div>
+      <div class="wcard wh rev d2 tilt3d">
+        <div class="wi"><svg width="24" height="24" fill="none" stroke="#e07dac" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="wt">For Hosts</div>
+        <div class="ws">Monetise your idle hours automatically.</div>
+        <ul class="wl">
+          <li>KYC onboarding with easy document upload</li>
+          <li>Photo-rich property listings with multiple images</li>
+          <li>Dynamic pricing &amp; availability calendar</li>
+          <li>Real-time booking notifications</li>
+          <li>Earnings dashboard — daily / weekly / monthly</li>
+          <li>Payout tracking &amp; reconciliation</li>
+          <li>KYC-verified renters only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- DOWNLOAD -->
+<section id="download" class="dl-sec">
+  <div class="dl-glow"></div>
+  <div class="dl-card rev tilt3d">
+    <div class="badge" style="margin-bottom:1.3rem;justify-content:center"><em></em> Available Now</div>
+    <h2 class="dl-h">Start booking<br/><span class="gr">your space today.</span></h2>
+    <p class="dl-s">India's first hourly space marketplace. No deposits. No lock-ins. Just your space, your time.</p>
+    <div class="dl-btns">
+      <a href="posomepa.apk" download="posomepa.apk" class="dlb">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.54 3.99zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <div><span class="ds">Download on the</span><span class="dn">App Store</span></div>
+      </a>
+      <a href="posomepa.apk" download="posomepa.apk" class="dlb">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199a1 1 0 0 1 0 1.984l-1.503.87L13.793 10l3.905-2.492zm-9.589-4.12l10.937 6.333-2.302 2.302-8.635-8.635z"/></svg>
+        <div><span class="ds">Get it on</span><span class="dn">Google Play</span></div>
+      </a>
+      <a href="posomepa.apk" download="posomepa.apk" class="dlb">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <div><span class="ds">Direct download</span><span class="dn">APK File</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+<div class="div"></div>
+
+<!-- TECH -->
+<section style="padding:clamp(4rem,8vw,6.5rem) clamp(1.2rem,5vw,2rem)">
+  <div class="cnt">
+    <div class="rev">
+      <span class="eye">Technology</span>
+      <h2 class="sec-h">Every choice is<br/><span class="gr">a business advantage.</span></h2>
+      <p class="sec-s">Modern, scalable stack — ready to grow from 100 listings to 100,000 with zero re-architecture.</p>
+    </div>
+    <div class="tech-row rev">
+      <div class="tbadge"><div class="td" style="background:#f97316"></div><div><div class="tn">Groq AI (LLM)</div><div class="tr">Search &amp; moderation</div></div></div>
+      <div class="tbadge"><div class="td" style="background:#4ade80"></div><div><div class="tn">MongoDB Atlas</div><div class="tr">Scalable backend</div></div></div>
+      <div class="tbadge"><div class="td" style="background:#f59e0b"></div><div><div class="tn">Firebase Auth + JWT</div><div class="tr">Secure auth</div></div></div>
+      <div class="tbadge"><div class="td" style="background:#3b82f6"></div><div><div class="tn">Razorpay</div><div class="tr">Instant payments</div></div></div>
+      <div class="tbadge"><div class="td" style="background:#a855f7"></div><div><div class="tn">React Native / Expo</div><div class="tr">iOS &amp; Android</div></div></div>
+      <div class="tbadge"><div class="td" style="background:#ec4899"></div><div><div class="tn">Cloudinary CDN</div><div class="tr">Media storage</div></div></div>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <div class="fl">POSOMEPA</div>
+  <div class="ft">post some places · India's hourly space marketplace</div>
+  <div class="ft">© 2026 PosomePa. All rights reserved.</div>
+</footer>
+
+<script>
+// cursor
+if(window.matchMedia('(hover:hover)').matches){
+  const dot=document.getElementById('cdot'),ring=document.getElementById('cring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+  (function tick(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick)})();
+}
+// hamburger
+const hbg=document.getElementById('hbg'),mm=document.getElementById('mmenu'),mmc=document.getElementById('mmclose');
+hbg.onclick=()=>mm.classList.contains('open')?mm.classList.remove('open'):mm.classList.add('open');
+mmc.onclick=()=>mm.classList.remove('open');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')mm.classList.remove('open')});
+function closeMM(){mm.classList.remove('open')}
+// nav bg on scroll
+window.addEventListener('scroll',()=>{document.getElementById('nav').style.background=scrollY>60?'rgba(13,8,32,.95)':'rgba(13,8,32,.6)'});
+// reveal on scroll
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1});
+document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
+
+// 3D tilt
+if(window.matchMedia('(hover:hover)').matches){
+  document.querySelectorAll('.tilt3d').forEach(el=>{
+    const rect=()=>el.getBoundingClientRect();
+    el.addEventListener('mousemove',e=>{
+      const r=rect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+      const dx=(e.clientX-cx)/r.width,dy=(e.clientY-cy)/r.height;
+      el.style.transform=`perspective(900px) rotateY(${dx*12}deg) rotateX(${-dy*12}deg) scale(1.025)`;
+    });
+    el.addEventListener('mouseleave',()=>{el.style.transform='perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)'});
+  });
+  // Phone center tilt
+  const phc=document.querySelector('.ph-c');
+  if(phc){
+    const pw=phc.closest('.mock-wrap');
+    pw&&pw.addEventListener('mousemove',e=>{
+      const r=phc.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+      const dx=(e.clientX-cx)/r.width,dy=(e.clientY-cy)/r.height;
+      phc.style.transform=`perspective(900px) rotateY(${dx*10}deg) rotateX(${-dy*10}deg) scale(1.04) translateZ(20px)`;
+    });
+    pw&&pw.addEventListener('mouseleave',()=>{phc.style.transform=''});
+  }
+}
+</script>
+</body>
+</html>
