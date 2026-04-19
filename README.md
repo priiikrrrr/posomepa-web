@@ -4,7 +4,7 @@
 
 Discover and book workspaces, creative studios & event venues by the hour — no deposits, no lock-ins, zero friction.
 
-[![Live Site](https://img.shields.io/badge/Live-posomepa.pages.dev-purple?style=flat&logo=cloudflare)](https://posomepa-web.pages.dev/)
+[![Live Site](https://img.shields.io/badge/Live-posomepa-web.pages.dev-purple?style=flat&logo=cloudflare)](https://posomepa-web.pages.dev/)
 
 ## What is PosomePa?
 
@@ -66,7 +66,7 @@ python -m http.server 8000
 
 Connected to Cloudflare Pages. Every push to `main` auto-deploys.
 
-**Live URL**: [https://posomepa.pages.dev](https://posomepa-web.pages.dev/)
+**Live URL**: [https://posomepa-web.pages.dev](https://posomepa-web.pages.dev/)
 
 ## License
 
