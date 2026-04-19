@@ -66,7 +66,7 @@ python -m http.server 8000
 
 Connected to Cloudflare Pages. Every push to `main` auto-deploys.
 
-**Live URL**: https://posomepa.pages.dev
+**Live URL**: [https://posomepa-web.pages.dev](https://posomepa-web.pages.dev/)
 
 ## License
 
