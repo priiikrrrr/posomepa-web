@@ -4,7 +4,7 @@
 
 Discover and book workspaces, creative studios & event venues by the hour — no deposits, no lock-ins, zero friction.
 
-[![Live Site](https://img.shields.io/badge/Live-posomepa-web.pages.dev-purple?style=flat&logo=cloudflare)](https://posomepa-web.pages.dev/)
+[![Live Site](https://img.shields.io/badge/Live-Visit-purple)](https://posomepa-web.pages.dev/)
 
 ## What is PosomePa?
 
