@@ -341,6 +341,137 @@ html[data-theme="light"] .theme-toggle:hover{background:rgba(124,92,224,.18);col
 html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
 @media(max-width:768px){.theme-toggle span{display:none}}
 
+/* ===== FOUNDER PROFILE ===== */
+.animated-profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.8rem;
+    max-width: 340px;
+    margin: 0 auto;
+}
+.founder-circle-scene {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateZ(0);
+}
+.fc-element {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.65;
+}
+.fc-ring-1 {
+    width: 240px; height: 240px;
+    border: 1.2px dashed rgba(176,108,251,.3);
+    animation: fc-spin-centered 18s linear infinite;
+}
+.fc-ring-2 {
+    width: 275px; height: 275px;
+    border: 1.2px dotted rgba(255,110,180,.2);
+    animation: fc-spin-centered 28s linear infinite reverse;
+}
+.fc-orbit {
+    transform: translate(-50%, -50%);
+}
+.fc-orbit-1 { width: 240px; height: 240px; animation: fc-spin-centered 12s linear infinite; }
+.fc-orbit-2 { width: 275px; height: 275px; animation: fc-spin-centered 8s linear infinite reverse; }
+.fc-orbit-3 { width: 215px; height: 215px; animation: fc-spin-centered 20s linear infinite; }
+.fc-dot {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    opacity: 0.8;
+}
+.fc-dot-acc { width: 8px; height: 8px; background:var(--acc); box-shadow: 0 0 6px var(--acc); }
+.fc-dot-pink { width: 6px; height: 6px; background:var(--acc2); box-shadow: 0 0 5px var(--acc2); }
+.fc-dot-light { width: 5px; height: 5px; background:var(--p200); box-shadow: 0 0 4px var(--p200); }
+.fc-glow-pulse {
+    width: 190px; height: 190px;
+    background: radial-gradient(circle, rgba(176,108,251,.2) 0%, rgba(255,110,180,.08) 50%, transparent 72%);
+    animation: fc-pulse-centered 3s ease-in-out infinite;
+    z-index: 1;
+}
+.fc-circle {
+    position: relative;
+    z-index: 2;
+    width: 175px; height: 175px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(176,108,251,.45);
+    box-shadow:
+        0 0 0 5px rgba(176,108,251,.08),
+        0 0 30px rgba(176,108,251,.2),
+        0 15px 40px rgba(0,0,0,.3);
+    flex-shrink: 0;
+    animation: fc-float 5s ease-in-out infinite;
+}
+.fc-circle img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: saturate(1.03) contrast(1.02);
+    display: block;
+}
+.fc-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 65%, rgba(13,8,32,.3) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.founder-photo-badge {
+    position: relative;
+    background: rgba(13,8,32,.7);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(176,108,251,.22);
+    border-radius: 12px;
+    padding: 0.7rem 1.3rem;
+    text-align: center;
+    width: auto;
+    opacity: 0.9;
+}
+.founder-badge-name {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;
+    background:linear-gradient(135deg,#fff,var(--p300));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.founder-badge-role { font-size:.72rem; color:var(--acc); letter-spacing:.08em; margin-top:.18rem; }
+@keyframes fc-spin-centered {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes fc-pulse-centered {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .7; }
+    50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+@keyframes fc-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+html[data-theme="light"] .founder-photo-badge { background: rgba(248,245,255,.85); border-color: rgba(124,92,224,.2); }
+html[data-theme="light"] .founder-badge-name { background: linear-gradient(135deg,#1a0840,var(--p500)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+html[data-theme="light"] .fc-ring-1 { border-color: rgba(124,92,224,.25); }
+html[data-theme="light"] .fc-ring-2 { border-color: rgba(201,85,138,.18); }
+html[data-theme="light"] .fc-glow-pulse { background: radial-gradient(circle, rgba(124,92,224,.2) 0%, transparent 72%); }
+html[data-theme="light"] .fc-circle { border-color: rgba(124,92,224,.45); box-shadow: 0 0 0 5px rgba(124,92,224,.08), 0 0 30px rgba(124,92,224,.2), 0 15px 40px rgba(0,0,0,.1); }
+@media(max-width:400px){
+    .founder-circle-scene { width: 250px; height: 250px; }
+    .fc-ring-1, .fc-orbit-1 { width: 215px; height: 215px; }
+    .fc-ring-2, .fc-orbit-2 { width: 245px; height: 245px; }
+    .fc-orbit-3 { width: 195px; height: 195px; }
+    .fc-glow-pulse { width: 170px; height: 170px; }
+    .fc-circle { width: 155px; height: 155px; }
+}
+
 </style>
 </head>
 <body>
@@ -794,6 +925,30 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
       </div>
     </div>
   </div>
+</section>
+
+<div class="div"></div>
+
+<!-- FOUNDER SECTION -->
+<section style="padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,2rem);text-align:center">
+    <div class="animated-profile-container rev">
+        <div class="founder-circle-scene">
+            <div class="fc-glow-pulse fc-element"></div>
+            <div class="fc-ring-1 fc-element"></div>
+            <div class="fc-orbit fc-orbit-1 fc-element"> <div class="fc-dot fc-dot-acc"></div> </div>
+            <div class="fc-orbit fc-orbit-2 fc-element"> <div class="fc-dot fc-dot-pink"></div> </div>
+            <div class="fc-orbit fc-orbit-3 fc-element"> <div class="fc-dot fc-dot-light"></div> </div>
+            <div class="fc-circle">
+                <img src="path/to/lokesh-profile.jpg" alt="Lokesh — Founder of PosomePa">
+                <div class="fc-overlay"></div>
+            </div>
+            <div class="fc-ring-2 fc-element"></div>
+        </div>
+        <div class="founder-photo-badge">
+            <div class="founder-badge-name">LOKESH</div>
+            <div class="founder-badge-role">FOUNDER, PosomePa</div>
+        </div>
+    </div>
 </section>
 
 <div class="div"></div>
