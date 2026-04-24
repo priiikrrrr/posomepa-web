@@ -602,10 +602,18 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
 }
 @media(max-width:768px){
   .cat-canvas{top:60px}
-  .fcat{font-size:.68rem;padding:.4rem .8rem;gap:.35rem}
-  /* Pull right-edge pills back inside on mobile */
-  .fcat[style*="left:8"],.fcat[style*="left:9"]{
-    left:auto!important;right:2%!important;
+  .fcat{
+    font-size:.68rem;padding:.4rem .8rem;gap:.35rem;
+    left:clamp(2vw,var(--x,52vw))!important;
+    top:clamp(5%,var(--y),90%)!important;
+    max-width:44vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+}
+@media(max-width:480px){
+  .fcat{
+    font-size:.6rem;padding:.32rem .65rem;gap:.3rem;
+    left:clamp(2vw,var(--x,48vw))!important;
+    max-width:40vw;
   }
 }
 /* vignette sits above pills, text sits above vignette */
@@ -1339,6 +1347,25 @@ document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
   const hero = document.querySelector('.hero');
   const pills = [...document.querySelectorAll('.fcat')];
   if (!hero || !pills.length) return;
+
+  // Mobile redistribution: evenly spread pills on small screens
+  const isMobile = window.innerWidth <= 768;
+  if(isMobile){
+    const cols = 2;
+    const rows = Math.ceil(pills.length / cols);
+    pills.forEach((p, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const leftPct = col === 0 
+        ? (5 + Math.random() * 35) 
+        : (55 + Math.random() * 35);
+      const topPct = 5 + (row / rows) * 85 + Math.random() * 5;
+      p.style.setProperty('--x', leftPct + '%');
+      p.style.setProperty('--y', topPct + '%');
+      p.style.left = leftPct + '%';
+      p.style.top = topPct + '%';
+    });
+  }
 
   // Per-pill params
   const params = pills.map(p => {
