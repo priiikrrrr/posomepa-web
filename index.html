@@ -41,7 +41,14 @@ html[data-theme="light"]{
   --nav-border:rgba(124,92,224,.14);
 }
 html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--wh);overflow-x:hidden;transition:background .4s,color .4s}
+
+/* Global responsive fix */
+@media(max-width:768px){
+  *{box-sizing:border-box}
+  body,html{width:100%;max-width:100%}
+}
 
 /* noise */
 body::before{content:'';position:fixed;inset:0;opacity:.5;pointer-events:none;z-index:900;
@@ -158,7 +165,7 @@ html[data-theme="light"] .hero-cta:hover{color:#1a0840;border-color:rgba(124,92,
 
 /* shared */
 section{padding:clamp(4rem,8vw,7rem) clamp(1.2rem,5vw,2rem);position:relative}
-.cnt{max-width:1100px;margin:0 auto}
+.cnt{max-width:1100px;margin:0 auto;width:100%;padding-left:clamp(1rem,3vw,2rem);padding-right:clamp(1rem,3vw,2rem)}
 .eye{display:inline-block;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:.85rem}
 .sec-h{font-family:'Syne',sans-serif;font-size:clamp(1.75rem,4.5vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
 .sec-s{color:var(--sec-s);font-size:clamp(1rem,1.15vw,1.1rem);line-height:1.7;font-weight:300;max-width:490px}
@@ -167,6 +174,7 @@ section{padding:clamp(4rem,8vw,7rem) clamp(1.2rem,5vw,2rem);position:relative}
 .rev.vis{opacity:1;transform:translateY(0)}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
 @media(max-width:768px){section{padding:clamp(3rem,6vw,5rem) clamp(1rem,3vw,1.5rem)}.sec-h{font-size:clamp(1.4rem,3.5vw,2.2rem);margin-bottom:.8rem}.sec-s{font-size:.95rem;max-width:100%}.eye{font-size:.62rem;letter-spacing:.15em}}
+@media(max-width:480px){.cnt{padding-left:.8rem;padding-right:.8rem}}
 
 
 /* ABOUT US */
@@ -376,16 +384,17 @@ html[data-theme="light"] .hstepper::before{background:linear-gradient(90deg,rgba
 .sd{color:var(--mu);font-size:clamp(.86rem,1vw,.97rem);line-height:1.65;font-weight:300}
 
 /* HORIZONTAL STEPPER */
-.hstepper{display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-top:3.5rem;position:relative}
+.hstepper{display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;margin-top:3.5rem;position:relative;max-width:100%;width:100%}
 .hstepper::before{content:'';position:absolute;top:36px;left:36px;right:36px;height:2px;background:linear-gradient(90deg,var(--border-c),var(--border-h),var(--border-c));z-index:0}
-.hstep{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
+.hstep{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;max-width:33.33%}
 .hstep-num{width:72px;height:72px;border-radius:50%;background:var(--bg);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--acc);margin-bottom:1.5rem;flex-shrink:0}
 .hstep-icon{width:52px;height:52px;background:rgba(176,108,251,.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem}
 .hstep-icon svg{width:24px;height:24px}
 .hstep-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
 .hstep-desc{color:var(--mu);font-size:.9rem;line-height:1.6;font-weight:300;max-width:220px}
-@media(max-width:900px){.hstepper{padding:0 1rem}.hstep-num{width:60px;height:60px;font-size:1.25rem}.hstep-icon{width:44px;height:44px}.hstep-icon svg{width:20px;height:20px}.hstep-desc{max-width:180px;font-size:.82rem}}
-@media(max-width:768px){.hstepper{flex-direction:column;gap:2.5rem;align-items:center}.hstepper::before{top:36px;bottom:36px;left:calc(50% - 1px);right:auto;width:2px;height:auto}.hstep{flex-direction:row;flex-wrap:wrap;gap:1.2rem;text-align:left;max-width:100%}.hstep-num{margin-bottom:0;width:56px;height:56px}.hstep-icon{margin-bottom:0}.hstep-desc{max-width:100%;font-size:.9rem}}
+.hstep-content{display:flex;flex-direction:column;flex:1}
+@media(max-width:900px){.hstepper{padding:0 .5rem}.hstep-num{width:60px;height:60px;font-size:1.25rem}.hstep-icon{width:44px;height:44px}.hstep-icon svg{width:20px;height:20px}.hstep-desc{max-width:180px;font-size:.82rem}}
+@media(max-width:768px){.hstepper{flex-direction:column;gap:2.5rem;align-items:center;max-width:100%}.hstepper::before{display:none}.hstep{flex-direction:row;flex-wrap:wrap;gap:1rem;text-align:left;max-width:100%;width:100%;justify-content:flex-start;align-items:center}.hstep-num{margin-bottom:0;width:52px;height:52px;font-size:1.1rem;flex-shrink:0}.hstep-icon{display:none}.hstep-content{flex:1}.hstep-title{font-size:1rem;margin-bottom:.3rem}.hstep-desc{font-size:.85rem;max-width:100%}}
 
 /* BENTO */
 .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem;margin-top:3.5rem}
@@ -441,6 +450,8 @@ html[data-theme="light"] .hstepper::before{background:linear-gradient(90deg,rgba
 .tbadge:hover{border-color:var(--border-h);transform:translateY(-2px)}
 .td{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .tn{font-size:clamp(.84rem,1.1vw,.97rem);font-weight:500}.tr{font-size:clamp(.7rem,.9vw,.82rem);color:var(--mu);margin-top:.1rem}
+@media(max-width:768px){.tech-row{gap:.6rem;margin-top:2rem}.tbadge{padding:.65rem .9rem;min-width:140px}}
+@media(max-width:480px){.tech-row{flex-direction:column}.tbadge{width:100%}}
 
 /* DOWNLOAD */
 .dl-sec{padding:clamp(4rem,8vw,7rem) 1.5rem;text-align:center;position:relative;overflow:hidden}
@@ -586,6 +597,11 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
   pointer-events:none;
   z-index:1; /* above dot grid, below vignette */
   overflow:hidden;
+  max-width:100vw;
+  width:100%;
+}
+@media(max-width:768px){
+  .cat-canvas{top:60px}
 }
 /* vignette sits above pills, text sits above vignette */
 .hero::after{ z-index:2; }
@@ -633,6 +649,15 @@ html[data-theme="light"] .hero::before{
     opacity 0.4s ease;
   will-change:transform;
 }
+@media(max-width:900px){
+  .fcat{font-size:.75rem;padding:.45rem .9rem;gap:.4rem}
+}
+@media(max-width:768px){
+  .fcat{font-size:.68rem;padding:.4rem .8rem;gap:.35rem}
+}
+@media(max-width:480px){
+  .fcat{font-size:.6rem;padding:.32rem .65rem;gap:.3rem}
+}
 
 html[data-theme="light"] .fcat{
   background:rgba(248,245,255,.72);
@@ -661,6 +686,9 @@ html[data-theme="light"] .fcat:hover{
   width:7px;height:7px;border-radius:50%;flex-shrink:0;opacity:.85;
   transition:opacity .3s,transform .3s;
 }
+@media(max-width:768px){.fcat-dot{width:6px;height:6px}}
+@media(max-width:480px){.fcat-dot{width:5px;height:5px}}
+@media(max-width:480px){.fcat-dot{width:5px;height:5px}}
 .fcat:hover .fcat-dot{opacity:1;transform:scale(1.3)}
 </style>
 </head>
@@ -789,20 +817,26 @@ html[data-theme="light"] .fcat:hover{
       <div class="hstep rev d1">
         <div class="hstep-num">01</div>
         <div class="hstep-icon"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
-        <div class="hstep-title">Start browsing</div>
-        <div class="hstep-desc">Open the app, explore spaces near you, and check real-time availability — all in seconds. No account maze, no endless scrolling.</div>
+        <div class="hstep-content">
+          <div class="hstep-title">Start browsing</div>
+          <div class="hstep-desc">Open the app, explore spaces near you, and check real-time availability — all in seconds. No account maze, no endless scrolling.</div>
+        </div>
       </div>
       <div class="hstep rev d2">
         <div class="hstep-num">02</div>
         <div class="hstep-icon"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-        <div class="hstep-title">Pick your perfect slot</div>
-        <div class="hstep-desc">Filter by category, price, and amenities. Choose your date, time, and duration from live availability. What you see is what you pay — zero hidden fees, ever.</div>
+        <div class="hstep-content">
+          <div class="hstep-title">Pick your perfect slot</div>
+          <div class="hstep-desc">Filter by category, price, and amenities. Choose your date, time, and duration from live availability. What you see is what you pay — zero hidden fees, ever.</div>
+        </div>
       </div>
       <div class="hstep rev d3">
         <div class="hstep-num">03</div>
         <div class="hstep-icon"><svg fill="none" stroke="var(--acc)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></div>
-        <div class="hstep-title">Confirm &amp; walk right in</div>
-        <div class="hstep-desc">Pay securely via Razorpay in under 30 seconds. You get instant confirmation, GPS directions to your door, and a direct line to your host — all in one place.</div>
+        <div class="hstep-content">
+          <div class="hstep-title">Confirm &amp; walk right in</div>
+          <div class="hstep-desc">Pay securely via Razorpay in under 30 seconds. You get instant confirmation, GPS directions to your door, and a direct line to your host — all in one place.</div>
+        </div>
       </div>
     </div>
   </div>
