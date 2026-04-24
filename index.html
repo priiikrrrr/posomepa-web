@@ -602,6 +602,11 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
 }
 @media(max-width:768px){
   .cat-canvas{top:60px}
+  .fcat{font-size:.68rem;padding:.4rem .8rem;gap:.35rem}
+  /* Pull right-edge pills back inside on mobile */
+  .fcat[style*="left:8"],.fcat[style*="left:9"]{
+    left:auto!important;right:2%!important;
+  }
 }
 /* vignette sits above pills, text sits above vignette */
 .hero::after{ z-index:2; }
@@ -654,6 +659,15 @@ html[data-theme="light"] .hero::before{
 }
 @media(max-width:768px){
   .fcat{font-size:.68rem;padding:.4rem .8rem;gap:.35rem}
+  /* Constrain pills within viewport on mobile - prevent right overflow */
+  .fcat{
+    max-width:calc(100vw - 2rem);
+    position:absolute;
+  }
+  /* Override right-positioned pills to stay inside */
+  .fcat[style*="left:8"],.fcat[style*="left:9"]{
+    left:auto!important;right:1rem!important;
+  }
 }
 @media(max-width:480px){
   .fcat{font-size:.6rem;padding:.32rem .65rem;gap:.3rem}
