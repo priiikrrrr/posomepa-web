@@ -601,18 +601,15 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
   width:100%;
 }
 @media(max-width:768px){
-  .cat-canvas{top:52px;overflow:hidden}
+  .cat-canvas{overflow:hidden}
   .fcat{
-    font-size:.65rem;padding:.35rem .55rem;gap:.25rem;
-    max-width:38vw!important;overflow:hidden!important;text-overflow:ellipsis!important;
-white-space:nowrap;
+    font-size:.68rem!important;padding:.4rem .8rem!important;gap:.35rem!important;
+    max-width:36vw!important;overflow:hidden!important;
+    text-overflow:ellipsis!important;white-space:nowrap!important;
   }
 }
 @media(max-width:480px){
-  .fcat{
-    font-size:.58rem;padding:.28rem .45rem;gap:.2rem;
-    max-width:36vw;
-  }
+  .fcat{font-size:.6rem;padding:.32rem .65rem;gap:.3rem;max-width:34vw}
 }
 /* vignette sits above pills, text sits above vignette */
 .hero::after{ z-index:2; }
@@ -1346,30 +1343,20 @@ document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
   const pills = [...document.querySelectorAll('.fcat')];
   if (!hero || !pills.length) return;
 
-  // Mobile redistribution: evenly spread pills on small screens
+  // Mobile redistribution: deterministic grid - 2 columns, evenly spaced
   const isMobile = window.innerWidth <= 768;
   if(isMobile){
-    const cols = 2;
-    const rows = Math.ceil(pills.length / cols);
+    const totalRows = Math.ceil(pills.length / 2);
+    const rowHeight = 88 / totalRows; // spread across 88% height
+    
     pills.forEach((p, i) => {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      // Left column: 3-35%, Right column: 52-80% max
-      const leftPct = col === 0 
-        ? (3 + Math.random() * 32) 
-        : (52 + Math.random() * 28);
-      // Distribute across height with dead zone avoidance
-      const baseTop = 8 + (row / rows) * 72;
-      const heroCenterTop = 42;
-      const deadZone = 16;
-      let finalTop = baseTop;
-      // Push pills away from center where hero text sits
-      if(finalTop > heroCenterTop - deadZone && finalTop < heroCenterTop + deadZone){
-        finalTop = col === 0 ? finalTop - deadZone : finalTop + deadZone;
-      }
-      finalTop = Math.max(3, Math.min(92, finalTop));
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const leftPct = col === 0 ? 3 : 58;
+      const topPct = 4 + row * rowHeight;
+      
       p.style.left = leftPct + '%';
-      p.style.top = finalTop + '%';
+      p.style.top = topPct + '%';
     });
   }
 
