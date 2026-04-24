@@ -33,8 +33,7 @@ PosomePa is a marketplace that lets you rent spaces — from coworking desks to 
 - 🎵 Music Rooms
 - 📸 Photo Studios
 - 💼 Meeting Rooms
-- 🧘 Wellness Spaces
-- 🍳 Pop-up Kitchens
+- 🧘 Wellness Space
 
 ## How It Works
 
