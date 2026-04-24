@@ -603,9 +603,9 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
 @media(max-width:768px){
   .cat-canvas{overflow:hidden}
   .fcat{
-    font-size:.68rem!important;padding:.4rem .8rem!important;gap:.35rem!important;
-    max-width:36vw!important;overflow:hidden!important;
-    text-overflow:ellipsis!important;white-space:nowrap!important;
+    font-size:.68rem!important;padding:.4rem .8rem!important;max-width:38vw!important;
+    overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+    left:clamp(2vw,var(--x),56vw)!important;
   }
 }
 @media(max-width:480px){
@@ -1343,20 +1343,18 @@ document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
   const pills = [...document.querySelectorAll('.fcat')];
   if (!hero || !pills.length) return;
 
-  // Mobile redistribution: deterministic grid - 2 columns, evenly spaced
+  // Mirror left position as CSS variable for clamp
+  pills.forEach(p => {
+    if(p.style.left) p.style.setProperty('--x', p.style.left);
+  });
+
+  // Mobile: hide every other pill to reduce clutter
   const isMobile = window.innerWidth <= 768;
   if(isMobile){
-    const totalRows = Math.ceil(pills.length / 2);
-    const rowHeight = 88 / totalRows; // spread across 88% height
-    
     pills.forEach((p, i) => {
-      const col = i % 2;
-      const row = Math.floor(i / 2);
-      const leftPct = col === 0 ? 3 : 58;
-      const topPct = 4 + row * rowHeight;
-      
-      p.style.left = leftPct + '%';
-      p.style.top = topPct + '%';
+      if(i % 2 !== 0) {
+        p.style.display = 'none';
+      }
     });
   }
 
