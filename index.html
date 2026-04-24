@@ -595,24 +595,23 @@ html[data-theme="light"] .theme-toggle svg{transform:rotate(180deg)}
   position:absolute;
   top:72px;left:0;right:0;bottom:0;
   pointer-events:none;
-  z-index:1; /* above dot grid, below vignette */
+  z-index:1;
   overflow:hidden;
   max-width:100vw;
   width:100%;
 }
 @media(max-width:768px){
-  .cat-canvas{top:60px}
+  .cat-canvas{top:55px;padding:0 2vw}}}
+@media(max-width:768px){
+  .cat-canvas{top:60px;overflow:hidden}
   .fcat{
-    font-size:.68rem;padding:.4rem .8rem;gap:.35rem;
-    left:clamp(2vw,var(--x,52vw))!important;
-    top:clamp(5%,var(--y),90%)!important;
+    font-size:.68rem;padding:.4rem .65rem;gap:.3rem;
     max-width:44vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
 }
 @media(max-width:480px){
   .fcat{
-    font-size:.6rem;padding:.32rem .65rem;gap:.3rem;
-    left:clamp(2vw,var(--x,48vw))!important;
+    font-size:.6rem;padding:.3rem .55rem;gap:.25rem;
     max-width:40vw;
   }
 }
@@ -1356,12 +1355,13 @@ document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
     pills.forEach((p, i) => {
       const col = i % cols;
       const row = Math.floor(i / cols);
+      // Left column: 4-38%, Right column: 54-88%
       const leftPct = col === 0 
-        ? (5 + Math.random() * 35) 
-        : (55 + Math.random() * 35);
-      const topPct = 5 + (row / rows) * 85 + Math.random() * 5;
-      p.style.setProperty('--x', leftPct + '%');
-      p.style.setProperty('--y', topPct + '%');
+        ? (4 + Math.random() * 34) 
+        : (54 + Math.random() * 34);
+      // Distribute evenly across height: 8% to 88%
+      const topPct = 8 + (row / rows) * 80;
+      // Set directly on element - CSS will use these values
       p.style.left = leftPct + '%';
       p.style.top = topPct + '%';
     });
